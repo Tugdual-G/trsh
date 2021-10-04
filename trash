@@ -1,0 +1,58 @@
+#!/bin/bash
+trashdir=~/.trash/
+list=$trashdir.list.txt
+no_args=true
+
+ Help()
+{
+   # Display Help
+   echo "move specified file to ~/.trash"
+   echo
+   echo "Syntax: trash [options] [arg] [files]"
+   echo "options:"
+   echo "   -h      show help"
+   echo "   -P      Purge trash directory,"
+   echo "           remove files older than [arg]days"
+}
+# Handle the options passed with -
+while getopts ":hP:" option; do
+    case $option in
+        h) # display Help
+            Help
+            exit;;
+        P) # delete old files
+	    # attribute the argument to days
+            days=$OPTARG
+
+	    # find files older than $days
+            find $trashdir -mtime +$days > $list
+            echo do you realy want to delete:
+            cat $list
+            while true; do
+                read -p "y/n :" dlt
+
+                if [ $dlt = "y" ]; then
+                    rm -i $(cat $list)
+                    break
+
+                elif [ $dlt = "n" ]; then
+                    break
+
+                else
+                    echo $dlt is not a valid choice
+                fi
+            done
+            exit;;
+    esac
+    no_args=false
+
+done
+
+if $no_args; then
+    dirname=$(pwd)
+    mkdir -p $trashdir$dirname
+    for filename in $@; do
+        mv $filename ~/.trash$dirname
+        echo moved $filename to ~/.trash$dirname
+    done
+fi
