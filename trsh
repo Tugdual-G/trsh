@@ -6,7 +6,7 @@ no_args=true
  Help()
 {
    # Display Help
-   echo "move specified file to ~/.trash"
+   echo "move specified files to ~/.trash"
    echo
    echo "Syntax: trash [options] [arg] [files]"
    echo "options:"
