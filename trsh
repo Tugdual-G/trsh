@@ -10,6 +10,8 @@ no_args=true
    echo
    echo "Syntax: trash [options] [arg] [files]"
    echo "options:"
+   echo " if no option is passed the files are moved
+   echo " to trash:
    echo "   -h      show help"
    echo "   -P      Purge trash directory,"
    echo "           remove files older than [arg]days"
@@ -52,7 +54,7 @@ if $no_args; then
     dirname=$(pwd)
     mkdir -p $trashdir$dirname
     for filename in $@; do
-        mv $filename ~/.trash$dirname
-        echo moved $filename to ~/.trash$dirname
+        mv $filename $trashdir$dirname
+        echo moved $filename to $trashdir$dirname
     done
 fi
