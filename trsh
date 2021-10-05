@@ -12,10 +12,32 @@ no_args=true
    echo "options:"
    echo "   -h      show help"
    echo "   -P      Purge trash directory,"
-   echo "           remove files older than [arg]days"
+   echo "            remove files older than [arg]days"
+   echo "   -a      ask for each file before purging" 
 }
+
+Delete()
+{
+
+    # find files older than $days
+    find $trashdir -ctime +$days > $list
+    echo do you realy want to delete:
+    cat $list
+    while true; do
+	read -p "y/n :" dlt
+	if [ $dlt = "y" ]; then
+	    rm $1 $(cat $list)
+	    break
+	elif [ $dlt = "n" ]; then
+	    break
+	else
+	    echo $dlt is not a valid choice
+	fi
+    done
+}
+
 # Handle the options passed with -
-while getopts ":hP:" option; do
+while getopts ":hP:a:" option; do
     case $option in
         h) # display Help
             Help
@@ -23,29 +45,15 @@ while getopts ":hP:" option; do
         P) # delete old files
 	    # attribute the argument to days
             days=$OPTARG
-
-	    # find files older than $days
-            find $trashdir -mtime +$days > $list
-            echo do you realy want to delete:
-            cat $list
-            while true; do
-                read -p "y/n :" dlt
-
-                if [ $dlt = "y" ]; then
-                    rm -i $(cat $list)
-                    break
-
-                elif [ $dlt = "n" ]; then
-                    break
-
-                else
-                    echo $dlt is not a valid choice
-                fi
-            done
-            exit;;
+	    Delete 
+	    exit;;
+        a) # delete old files
+	    # attribute the argument to days
+            days=$OPTARG
+	    Delete -i 
+	    exit;;
     esac
     no_args=false
-
 done
 
 if $no_args; then
@@ -56,3 +64,4 @@ if $no_args; then
         echo moved $filename to ~/.trash$dirname
     done
 fi
+
